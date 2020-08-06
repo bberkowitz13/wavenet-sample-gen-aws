@@ -73,11 +73,22 @@ class WavenetDataset(torch.utils.data.Dataset):
         print("one hot input")
         # assign every *test_stride*th item to the test set
     
+    def list_all_audio_files(self):
+        audio_files = []
+        for dirpath, dirnames, filenames in self._fs.walk(self._s3_data_location):
+            for filename in [f for f in filenames if f.endswith((".mp3", ".wav", ".aif", "aiff"))]:
+                audio_files.append(filename)
+
+        if len(audio_files) == 0:
+            print("found no audio files in " + location)
+        return audio_files
+    
+    
     # creates a dataset from files at s3://{self._s3_bucket}/{self._s3_base_folder}/{self.dataset_name}/
     def create_dataset(self, out_file):
         print("create dataset from audio files at", self._s3_data_location)
         self.dataset_file = out_file
-        files = list_all_audio_files()
+        files = self.list_all_audio_files()
         processed_files = []
         s3 = boto3.client('s3')
         for i, file in enumerate(files):
@@ -96,11 +107,14 @@ class WavenetDataset(torch.utils.data.Dataset):
             quantized_data = quantize_data(file_data, self.classes).astype(self.dtype)
             processed_files.append(quantized_data)
 
+        print(files)
         np.savez(self.dataset_file, *processed_files)
 
     def calculate_length(self):
         start_samples = [0]
+        print(self.data.keys())
         for i in range(len(self.data.keys())):
+            print(len(self.data['arr_' + str(i)]))
             start_samples.append(start_samples[-1] + len(self.data['arr_' + str(i)]))
         available_length = start_samples[-1] - (self._item_length - (self.target_length - 1)) - 1
         self._length = math.floor(available_length / self.target_length)
@@ -157,17 +171,6 @@ def quantize_data(data, classes):
     bins = np.linspace(-1, 1, classes)
     quantized = np.digitize(mu_x, bins) - 1
     return quantized
-
-
-def list_all_audio_files():
-    audio_files = []
-    for dirpath, dirnames, filenames in self._fs.walk(self._s3_data_location):
-        for filename in [f for f in filenames if f.endswith((".mp3", ".wav", ".aif", "aiff"))]:
-            audio_files.append(filename)
-
-    if len(audio_files) == 0:
-        print("found no audio files in " + location)
-    return audio_files
 
 
 def mu_law_encoding(data, mu):
