@@ -1,0 +1,6 @@
+scipy
+torch
+numpy
+librosa
+s3fs
+boto3
