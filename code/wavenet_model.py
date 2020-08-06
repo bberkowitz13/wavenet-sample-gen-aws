@@ -3,7 +3,7 @@ import os.path
 import time
 from wavenet_modules import *
 from audio_data import *
-
+import torch
 
 class WaveNetModel(nn.Module):
     """
@@ -143,9 +143,9 @@ class WaveNetModel(nn.Module):
 
             # dilated convolution
             filter = self.filter_convs[i](residual)
-            filter = F.tanh(filter)
+            filter = torch.tanh(filter)
             gate = self.gate_convs[i](residual)
-            gate = F.sigmoid(gate)
+            gate = torch.sigmoid(gate)
             x = filter * gate
 
             # parametrized skip connection
@@ -204,6 +204,7 @@ class WaveNetModel(nn.Module):
 
         num_pad = self.receptive_field - generated.size(0)
         if num_pad > 0:
+            print("type into const pad 1d: " + type(generated))
             generated = constant_pad_1d(generated, self.scope, pad_start=True)
             print("pad zero")
 

@@ -29,8 +29,6 @@ class WavenetTrainer:
                  lr=0.001,
                  weight_decay=0,
                  gradient_clipping=None,
-                 snapshot_path=None,
-                 snapshot_name='snapshot',
                  snapshot_interval=1000,
                  dtype=torch.FloatTensor,
                  ltype=torch.LongTensor):
@@ -45,9 +43,7 @@ class WavenetTrainer:
         self.weight_decay = weight_decay
         self.clip = gradient_clipping
         self.optimizer_type = optimizer
-        self.optimizer = self.optimizer_type(params=self.model.parameters(), lr=self.lr, weight_decay=self.weight_decay)
-        self.snapshot_path = snapshot_path
-        self.snapshot_name = snapshot_name
+        self.optimizer = self.optimizer_type(params=self.model.parameters(), lr=self.lr,    weight_decay=self.weight_decay)
         self.snapshot_interval = snapshot_interval
         self.dtype = dtype
         self.ltype = ltype
@@ -88,8 +84,6 @@ class WavenetTrainer:
                     print("one training step does take approximately " + str((toc - tic) * 0.01) + " seconds)")
 
                 if step % self.snapshot_interval == 0:
-                    if self.snapshot_path is None:
-                        continue
                     time_string = time.strftime("%Y-%m-%d_%H-%M-%S", time.gmtime())
                     
                     # save model locally

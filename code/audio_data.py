@@ -95,7 +95,7 @@ class WavenetDataset(torch.utils.data.Dataset):
             print("  processed " + str(i) + " of " + str(len(files)) + " files")
             
             # pull one file at a time from s3 bucket
-            s3_file = self._s3_base_folder + self._dataset_name + '/audio-files/' + file
+            s3_file = self._s3_base_folder + '/' + self._dataset_name + '/audio-files/' + file
             local_file = '/tmp/dummy.' + file.split('.')[1]
             s3.download_file(self._s3_bucket, s3_file, local_file)
             
