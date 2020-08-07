@@ -48,10 +48,10 @@ print('the dataset has ' + str(len(data)) + ' items')
 
 trainer = WavenetTrainer(model=model,
                          dataset=data,
+                         s3_folder='WavenetSampleGen/',
+                         s3_bucket='bensandboxbucket',
                          lr=0.0001,
                          weight_decay=0.0,
-                         snapshot_path='snapshots',
-                         snapshot_name='chaconne_model',
                          snapshot_interval=1000,
                          dtype=dtype,
                          ltype=ltype)
